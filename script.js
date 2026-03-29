@@ -1,29 +1,23 @@
-// Enhanced cursor follow with hover effects
+// ===================================================
+// CUSTOM CURSOR
+// ===================================================
 const cursor = document.querySelector(".cursor");
 
-document.addEventListener("mousemove", e => {
-  cursor.style.left = e.clientX + "px";
-  cursor.style.top = e.clientY + "px";
-});
-
-// Add hover effect for interactive elements
-const hoverElements = document.querySelectorAll(
-  "a, button, .skill-card, .work-card, .icon, .btn"
-);
-
-hoverElements.forEach(element => {
-  element.addEventListener("mouseenter", () => {
-    cursor.classList.add("hovering");
+if (cursor) {
+  document.addEventListener("mousemove", (e) => {
+    cursor.style.left = e.clientX + "px";
+    cursor.style.top = e.clientY + "px";
   });
-  
-  element.addEventListener("mouseleave", () => {
-    cursor.classList.remove("hovering");
-  });
-});
 
-// Scroll-triggered animations are handled by GSAP now
-// The previous fade functionality is replaced by GSAP animations
-// 🔐 ONLY PUBLIC KEY HERE
+  document.querySelectorAll("a, button, .skill-card, .work-card, .icon").forEach((el) => {
+    el.addEventListener("mouseenter", () => cursor.classList.add("hovering"));
+    el.addEventListener("mouseleave", () => cursor.classList.remove("hovering"));
+  });
+}
+
+// ===================================================
+// EMAILJS
+// ===================================================
 (function () {
   emailjs.init("cR87XXicmQbNyiE13");
 })();
@@ -31,24 +25,21 @@ hoverElements.forEach(element => {
 document.getElementById("contact-form").addEventListener("submit", function (e) {
   e.preventDefault();
 
-  emailjs.sendForm(
-    "service_eg4lgnu",       // ✅ your service id
-    "template_contact_us",   // ✅ your template id
-    this
-  ).then(
+  emailjs.sendForm("service_eg4lgnu", "template_contact_us", this).then(
     function () {
-      document.getElementById("status").innerText =
-        "Message sent successfully ✔";
+      document.getElementById("status").innerText = "Message sent successfully ✔";
       document.getElementById("contact-form").reset();
     },
     function (error) {
-      document.getElementById("status").innerText =
-        "Error sending message ❌";
+      document.getElementById("status").innerText = "Error sending message ❌";
       console.log("EmailJS Error:", error);
     }
   );
 });
-// ===== Mobile Menu Toggle =====
+
+// ===================================================
+// MOBILE MENU
+// ===================================================
 const menuToggle = document.getElementById("menuToggle");
 const navMenu = document.getElementById("navMenu");
 
@@ -56,177 +47,80 @@ menuToggle.addEventListener("click", () => {
   navMenu.classList.toggle("active");
 });
 
-// Close menu when link clicked (mobile UX)
-document.querySelectorAll("#navMenu a").forEach(link => {
+document.querySelectorAll("#navMenu a").forEach((link) => {
   link.addEventListener("click", () => {
     navMenu.classList.remove("active");
   });
 });
 
-// ===== GSAP Animations =====
+// ===================================================
+// GSAP ANIMATIONS
+// ===================================================
+gsap.registerPlugin(ScrollTrigger);
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Hero section animations
-  gsap.from(".hero-left h1", {
-    duration: 1,
-    y: 50,
-    opacity: 0,
-    delay: 0.2,
-    ease: "power3.out"
-  });
-  
-  gsap.from(".hero-left h2", {
-    duration: 1,
-    y: 30,
-    opacity: 0,
-    delay: 0.4,
-    ease: "power3.out"
-  });
-  
-  gsap.from(".hero-left p", {
-    duration: 1,
-    y: 30,
-    opacity: 0,
-    delay: 0.6,
-    ease: "power3.out"
-  });
-  
-  gsap.from(".hero-buttons", {
-    duration: 1,
-    y: 30,
-    opacity: 0,
-    delay: 0.8,
-    ease: "power3.out"
-  });
-  
-  gsap.from(".profile-circle", {
-    duration: 1.2,
-    scale: 0.5,
-    opacity: 0,
-    delay: 0.5,
-    ease: "back.out(1.7)"
-  });
-  
-  // Animate profile stats container
-  gsap.fromTo(".profile-stats", {
-    y: 30,
-    opacity: 0
-  }, {
-    y: 0,
-    opacity: 1,
-    duration: 0.8,
-    delay: 1.0,
-    ease: "power3.out"
-  });
-  
-  // Animate stat items individually
-  gsap.fromTo(".stat-item", 
-    { y: 20, opacity: 0 },
-    { 
-      y: 0, 
-      opacity: 1,
-      duration: 0.6,
-      stagger: 0.2,
-      delay: 1.3,
-      ease: "power2.out"
+// Hero entrance
+gsap.from(".hero-badge", { opacity: 0, y: 20, duration: 0.8, delay: 0.2 });
+gsap.from(".hero-greeting", { opacity: 0, y: 20, duration: 0.8, delay: 0.4 });
+gsap.from(".hero-name", { opacity: 0, y: 40, duration: 1, delay: 0.6 });
+gsap.from(".hero-role", { opacity: 0, x: -30, duration: 0.8, delay: 0.9 });
+gsap.from(".hero-desc", { opacity: 0, y: 20, duration: 0.8, delay: 1.1 });
+gsap.from(".hero-buttons", { opacity: 0, y: 20, duration: 0.8, delay: 1.3 });
+gsap.from(".hero-social-row", { opacity: 0, y: 20, duration: 0.8, delay: 1.5 });
+gsap.from(".hero-card", { opacity: 0, scale: 0.9, rotation: 5, duration: 1.2, delay: 0.8, ease: "back.out(1.7)" });
+gsap.from(".float-element", { opacity: 0, scale: 0, duration: 0.6, delay: 1.5, stagger: 0.15, ease: "back.out(2)" });
+
+// Typewriter effect
+const roles = ["Content Creator & Designer", "YouTube Thumbnail Expert", "Brand Identity Designer", "UI/UX Developer"];
+let roleIndex = 0;
+const roleEl = document.getElementById("heroRoleText");
+
+function typeRole() {
+  if (!roleEl) return;
+  const text = roles[roleIndex];
+  roleEl.textContent = "";
+  let i = 0;
+  const typeInterval = setInterval(() => {
+    roleEl.textContent += text[i];
+    i++;
+    if (i >= text.length) {
+      clearInterval(typeInterval);
+      setTimeout(() => {
+        roleIndex = (roleIndex + 1) % roles.length;
+        typeRole();
+      }, 2500);
     }
-  );
-  
+  }, 50);
+}
+setTimeout(typeRole, 2000);
 
-  
-  // Stagger animation for navigation items
-  gsap.from("nav a", {
-    duration: 0.8,
-    y: -20,
-    opacity: 0,
-    stagger: 0.1,
-    ease: "power2.out",
-    delay: 0.3
-  });
-  
-  // Scroll-triggered animations for sections
-  gsap.utils.toArray('.section, .skills-section, .contact-section, .social-section').forEach((section) => {
-    gsap.from(section, {
-      duration: 1,
-      y: 50,
-      opacity: 0,
-      scrollTrigger: {
-        trigger: section,
-        start: "top 80%",
-        toggleActions: "play none none reverse"
+// Scroll-triggered reveal — using IntersectionObserver for 100% reliability
+const revealElements = document.querySelectorAll(
+  ".about-section .section-badge, .about-section .title, .about-content .text, " +
+  ".section-title, .section-subtitle, .skill-card, " +
+  ".work-section .section-badge, .work-section .title, .work-card, " +
+  ".contact-left h2, .contact-left p, .local-info, .contact-form, " +
+  ".social-title, .social-thought, .icon"
+);
+
+revealElements.forEach((el) => {
+  el.classList.add("reveal");
+});
+
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("revealed");
+        observer.unobserve(entry.target);
       }
     });
-  });
-  
-  // Animate skill cards individually
-  gsap.utils.toArray('.skill-card').forEach((card, index) => {
-    gsap.from(card, {
-      duration: 0.8,
-      y: 30,
-      opacity: 0,
-      scrollTrigger: {
-        trigger: card,
-        start: "top 85%",
-        toggleActions: "play none none reverse"
-      },
-      delay: index * 0.1
-    });
-  });
-  
-  // Animate work cards
-  gsap.utils.toArray('.work-card').forEach((card, index) => {
-    gsap.from(card, {
-      duration: 0.8,
-      y: 30,
-      opacity: 0,
-      scrollTrigger: {
-        trigger: card,
-        start: "top 85%",
-        toggleActions: "play none none reverse"
-      },
-      delay: index * 0.1
-    });
-  });
-  
-  // Animate social icons
-  gsap.utils.toArray('.icon').forEach((icon, index) => {
-    gsap.from(icon, {
-      duration: 0.8,
-      y: 30,
-      opacity: 0,
-      scrollTrigger: {
-        trigger: icon,
-        start: "top 85%",
-        toggleActions: "play none none reverse"
-      },
-      delay: index * 0.1
-    });
-  });
-  
-  // Header animation on scroll
-  let header = document.querySelector('header');
-  
-  gsap.fromTo(header, 
-    { y: -100 },
-    {
-      y: 0,
-      duration: 1,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: header,
-        start: "top -50px",
-        toggleActions: "play none none reverse"
-      }
-    }
-  );
-  
-  // Photo glow pulsing animation
-  gsap.to(".photo-glow", {
-    scale: 1.05,
-    duration: 2,
-    repeat: -1,
-    yoyo: true,
-    ease: "sine.inOut",
-    delay: 1
-  });
+  },
+  { threshold: 0.1, rootMargin: "0px 0px -30px 0px" }
+);
+
+revealElements.forEach((el) => observer.observe(el));
+
+// Refresh ScrollTrigger after everything loads
+window.addEventListener("load", () => {
+  ScrollTrigger.refresh();
 });
